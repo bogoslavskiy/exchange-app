@@ -78,7 +78,7 @@ const ExchangeScreen = ({ navigation }: ExchangeScreenProps) => {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(false);
   const [rates, setRates] = React.useState<Rates>();
-  const [price, setPrice] = React.useState(100);
+  const [price, setPrice] = React.useState('100');
   const [currencyCode, setCurrencyCode] = React.useState('USD');
 
   const selectedCurrency = React.useMemo(() => {
@@ -93,7 +93,7 @@ const ExchangeScreen = ({ navigation }: ExchangeScreenProps) => {
     (currency: CurrencyItem): string => {
       const rate = (rates || {})[currency.code];
       if (rate) {
-        const value = rate * price || 0;
+        const value = rate * parseFloat(price) || 0;
         return formatCurrency(value, {
           decimalDigit: currency.decimal_digits,
           isSegment: false,
@@ -150,12 +150,12 @@ const ExchangeScreen = ({ navigation }: ExchangeScreenProps) => {
   );
 
   const handleChangePrice = React.useCallback((text: string) => {
-    const number = parseInt(text, 10) || 0;
-    if (number > 1e15) {
+    const price = text.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+    if (parseFloat(price) > 1e15) {
       return;
     }
 
-    setPrice(number);
+    setPrice(price);
   }, []);
 
   const hanldeChooseCurrency = React.useCallback((code: string) => {
@@ -175,7 +175,7 @@ const ExchangeScreen = ({ navigation }: ExchangeScreenProps) => {
             style={styles.input}
             keyboardType={'numeric'}
             onChangeText={handleChangePrice}
-            value={price === 0 ? '' : price.toString()}
+            value={price}
           />
         </View>
         <CurrencyListItem
