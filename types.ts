@@ -7,3 +7,12 @@ export interface CurrencyItem {
   code: string;
   name_plural: string;
 }
+
+export type Rates = {
+  [key: string]: number;
+};
+export interface RatesData {
+  rates: Rates;
+  base: string;
+  date: string;
+}

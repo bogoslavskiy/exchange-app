@@ -15,7 +15,7 @@ import { formatCurrency } from '@wangcch/format-currency';
 import { NavigationStackProp } from 'react-navigation-stack';
 import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
-import { CurrencyItem } from '../types';
+import { CurrencyItem, RatesData, Rates } from '../types';
 import CurrencyList from '../CurrencyList.json';
 import CurrencyListItem from '../components/CurrencyListItem';
 
@@ -77,7 +77,7 @@ interface ExchangeScreenProps {
 const ExchangeScreen = ({ navigation }: ExchangeScreenProps) => {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(false);
-  const [rates, setRates] = React.useState({});
+  const [rates, setRates] = React.useState<Rates>();
   const [price, setPrice] = React.useState(100);
   const [currencyCode, setCurrencyCode] = React.useState('USD');
 
@@ -91,7 +91,7 @@ const ExchangeScreen = ({ navigation }: ExchangeScreenProps) => {
 
   const calculate = React.useCallback(
     (currency: CurrencyItem): string => {
-      const rate = rates[currency.code];
+      const rate = (rates || {})[currency.code];
       if (rate) {
         const value = rate * price || 0;
         return formatCurrency(value, {
@@ -113,7 +113,7 @@ const ExchangeScreen = ({ navigation }: ExchangeScreenProps) => {
         const rawData = await fetch(
           `https://api.exchangeratesapi.io/latest?base=${code}`
         );
-        const data: any = await rawData.json();
+        const data: RatesData = await rawData.json();
 
         if (!data || !data.rates) {
           throw new Error('Error load rates');
